@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap');
+
+  .pp { font-family: 'Inter', sans-serif; max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  /* ── HERO ── */
+  .hero {
+    background: #111; border-radius: 20px; padding: 2.5rem 2rem 0;
+    margin-bottom: 1.25rem; position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: ''; position: absolute; width: 320px; height: 320px; top: -80px; right: -80px;
+    background: radial-gradient(circle, rgba(186, 117, 23, 0.22) 0%, transparent 65%); pointer-events: none;
+  }
+  .hero-body { display: flex; align-items: flex-start; justify-content: space-between; gap: 1.5rem; position: relative; z-index: 1; }
+  .hero-left { display: flex; gap: 1.2rem; align-items: center; }
+
+  /* Avatar with unified Logic */
+  .avi {
+    width: 80px; height: 80px; border-radius: 50%; padding: 2.5px; flex-shrink: 0;
+    background: conic-gradient(from 135deg, #EF9F27, #BA7517, #EF9F27);
+  }
+  .avi-inner {
+    width: 100%; height: 100%; border-radius: 50%; background: #1e1a14;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #EF9F27; overflow: hidden;
+  }
+  .avi-inner img { width: 100%; height: 100%; object-fit: cover; }
+
+  .hero-name { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+  .hero-bio { font-size: 13px; color: rgba(255, 255, 255, 0.4); margin-top: 5px; line-height: 1.65; max-width: 320px; }
+
+  /* Buttons & Badges */
+  .hero-actions { display: flex; flex-direction: column; gap: 7px; align-items: flex-end; position: relative; z-index: 1; }
+  .btn { display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 14px; border-radius: 8px; font-size: 12.5px; font-weight: 500; cursor: pointer; border: none; text-decoration: none; transition: all 0.15s; white-space: nowrap; }
+  .btn-amber { background: #BA7517; color: #fff; }
+  .btn-ghost { background: rgba(255, 255, 255, 0.07); color: rgba(255, 255, 255, 0.75); border: 0.5px solid rgba(255, 255, 255, 0.1); }
+  .btn-ghost:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
+
+  /* ── GRID ── */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .col-full { grid-column: 1 / -1; }
+  .panel { background: #fff; border-radius: 16px; border: 0.5px solid rgba(0, 0, 0, 0.07); overflow: hidden; transition: box-shadow 0.2s; }
+  .ph { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem 0.75rem; border-bottom: 0.5px solid #f0ede8; }
+  .ph-label { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: #bbb; }
+  .pb { padding: 1.1rem 1.25rem; }
+
+  /* Avatar Selector Styles */
+  .avatar-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+  .avatar-opt {
+    width: 50px; height: 50px; border-radius: 50%; border: 2px solid #f0ede8;
+    cursor: pointer; transition: 0.2s; padding: 2px;
+  }
+  .avatar-opt img { width: 100%; height: 100%; border-radius: 50%; }
+  .avatar-opt.selected { border-color: #BA7517; background: #FAEEDA; }
+
+  /* Restore Chip Styles */
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 500; color: #555; }
+  .dot-g { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
+  .dot-a { width: 6px; height: 6px; border-radius: 50%; background: #BA7517; }
+</style>
+
+<div class="pp">
+
+  <div class="hero">
+    <div class="hero-body">
+      <div class="hero-left">
+        <div class="avi">
+          <div class="avi-inner">
+            {% if user.3 %}
+              <img src="/static/avatars/avatar_{{ user.3 }}.png">
+            {% else %}
+              {{ user.0|slice:":1" }}{{ user.1|slice:":1" }}
+            {% endif %}
+          </div>
+        </div>
+        <div>
+          <div class="hero-name">{{ user.0 }} {{ user.1 }}</div>
+          <div class="hero-bio">{{ user.2 }}</div>
+          <div class="badges" style="display:flex; gap:6px; margin-top:9px;">
+            {% if is_author %}<span class="badge b-author" style="background:rgba(239,159,39,0.15); color:#EF9F27; padding:3px 10px; border-radius:100px; font-size:10.5px; font-weight:600; border:0.5px solid rgba(239,159,39,0.28);">Author</span>{% endif %}
+            {% if is_owner %}<span class="badge b-owner" style="background:rgba(62,207,142,0.12); color:#3ecf8e; padding:3px 10px; border-radius:100px; font-size:10.5px; font-weight:600; border:0.5px solid rgba(62,207,142,0.22);">Owner</span>{% endif %}
+            {% if publication and not is_owner %}<span class="badge b-member" style="background:rgba(160,160,255,0.12); color:#b0b0ff; padding:3px 10px; border-radius:100px; font-size:10.5px; font-weight:600; border:0.5px solid rgba(160,160,255,0.2);">Member</span>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        {% if not is_author %}
+          <a href="/toggle-author/" class="btn btn-amber">Join as Author</a>
+        {% endif %}
+        {% if is_author %}
+          <a href="/donations/" class="btn btn-ghost">Donations</a>
+        {% endif %}
+        {% if is_author and not is_owner %}
+          <a href="/create_publication/" class="btn btn-ghost">+ Publication</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="hero-bar" style="height: 1px; margin-top: 1.75rem; background: linear-gradient(90deg, #BA7517 0%, rgba(239, 159, 39, 0.5) 50%, transparent 100%);"></div>
+  </div>
+
+  <div class="grid">
+
+    <div class="panel col-full">
+      <div class="ph"><span class="ph-label">Personalize Avatar</span></div>
+      <div class="pb">
+        <form method="POST" action="/update_avatar/">
+          {% csrf_token %}
+          <div class="avatar-grid">
+            <div class="avatar-opt {% if not user.3 %}selected{% endif %}" onclick="setProfileAvatar('', this)" style="display:flex; align-items:center; justify-content:center; font-size:9px; color:#999; font-weight:700;">NONE</div>
+            {% for i in "123456"|make_list %}
+              <div class="avatar-opt {% if user.3|stringformat:'s' == forloop.counter|stringformat:'s' %}selected{% endif %}" onclick="setProfileAvatar('{{ forloop.counter }}', this)">
+                <img src="/static/avatars/avatar_{{ forloop.counter }}.png">
+              </div>
+            {% endfor %}
+          </div>
+          <input type="hidden" name="avatar_id" id="profile_avatar_id" value="{{ user.3|default:'' }}">
+          <button type="submit" class="btn btn-amber" style="margin-top:1.25rem;">Update Profile Photo</button>
+        </form>
+      </div>
+    </div>
+
+    {% if is_owner or publication or is_author %}
+    <div class="panel">
+      <div class="ph">
+        <span class="ph-label">Publication</span>
+        {% if is_owner %}<span class="chip"><span class="dot-g"></span>Owner</span>
+        {% elif publication %}<span class="chip"><span class="dot-a"></span>Member</span>{% endif %}
+      </div>
+      <div class="pb">
+        {% if is_owner %}
+        <a href="/owner-dashboard/" class="pub-block" style="display:flex; align-items:center; gap:11px; background:#f9f8f6; border:0.5px solid #e8e3db; border-radius:10px; padding:11px 13px; text-decoration:none;">
+          <div class="pub-ico" style="width:36px; height:36px; border-radius:8px; background:#1a1612; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg viewBox="0 0 24 24" style="width:15px; height:15px; stroke:#EF9F27; fill:none; stroke-width:1.8;"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l6 6v8a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+          </div>
+          <div>
+            <div class="pub-name" style="font-size:13.5px; font-weight:600; color:#1a1612;">{{ own_publication.1 }}</div>
+            <div class="pub-sub" style="font-size:11.5px; color:#aaa;">Owner dashboard →</div>
+          </div>
+        </a>
+        {% elif publication %}
+        <a href="/publication/{{ publication.0 }}/" class="pub-block" style="display:flex; align-items:center; gap:11px; background:#f9f8f6; border:0.5px solid #e8e3db; border-radius:10px; padding:11px 13px; text-decoration:none;">
+          <div class="pub-ico" style="width:36px; height:36px; border-radius:8px; background:#1a1612; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+             <svg viewBox="0 0 24 24" style="width:15px; height:15px; stroke:#EF9F27; fill:none; stroke-width:1.8;"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l6 6v8a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+          </div>
+          <div>
+            <div class="pub-name" style="font-size:13.5px; font-weight:600; color:#1a1612;">{{ publication.1 }}</div>
+            <div class="pub-sub" style="font-size:11.5px; color:#aaa;">View publication →</div>
+          </div>
+        </a>
+        {% else %}
+        <p style="font-size:13px;color:#bbb;margin-bottom:1rem;">No publication yet.</p>
+        <a href="/create_publication/" class="btn btn-outline" style="background:transparent; color:#BA7517; border:0.5px solid rgba(186,117,23,0.6);">+ Create Publication</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="panel">
+      <div class="ph"><span class="ph-label">Following</span></div>
+      <div class="pb">
+        {% if following %}
+        <div class="f-list" style="display:flex; flex-direction:column;">
+          {% for f in following %}
+          <div class="f-row" style="display:flex; align-items:center; gap:9px; padding:7px 0; border-bottom:0.5px solid #f5f3ee;">
+            <div class="f-avi" style="width:32px; height:32px; border-radius:50%; background:#1a1612; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#EF9F27; text-transform:uppercase;">{{ f.0|slice:":1" }}{{ f.1|slice:":1" }}</div>
+            <a href="/author/{{ f.2 }}" class="f-name" style="font-size:13px; font-weight:500; color:#222; text-decoration:none;">{{ f.0 }} {{ f.1 }}</a>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="f-empty" style="font-size:13px; color:#ccc; text-align:center; padding:1.2rem 0;">Not following anyone yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><span class="ph-label">Publications Following</span></div>
+      <div class="pb">
+        {% if publi_following %}
+        <div class="f-list">
+          {% for f in publi_following %}
+          <div class="f-row" style="display:flex; align-items:center; gap:9px; padding:7px 0; border-bottom:0.5px solid #f5f3ee;">
+            <div class="pub-ico" style="width:28px; height:28px; border-radius:6px; background:#1a1612; display:flex; align-items:center; justify-content:center;">
+               <svg viewBox="0 0 24 24" style="width:12px; height:12px; stroke:#EF9F27; fill:none; stroke-width:1.8;"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l6 6v8a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+            </div>
+            <a href="/publication/{{ f.0 }}" class="pub-follow-name" style="font-size:13px; font-weight:500; color:#222; text-decoration:none;">{{ f.1 }}</a>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="f-empty" style="font-size:13px; color:#ccc; text-align:center; padding:1.2rem 0;">Not following any yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="panel col-full">
+      <div class="ph"><span class="ph-label">Your Categories</span></div>
+      <div class="pb">
+        <form method="POST" action="/update_categories/">
+          {% csrf_token %}
+          <div class="cat-grid" style="display:flex; flex-wrap:wrap; gap:7px; margin-bottom:1.1rem;">
+            {% for c in categories %}
+            <div class="cat-chip">
+              <input type="checkbox" id="cat_{{ c.0 }}" name="categories" value="{{ c.0 }}" {% if c.0 in selected%} checked {% endif %} style="display:none;">
+              <label for="cat_{{ c.0 }}" style="display:inline-block; font-size:12px; font-weight:500; color:#666; border:0.5px solid #ddd; background:#f9f8f6; padding:5px 13px; border-radius:100px; cursor:pointer;">{{ c.1 }}</label>
+            </div>
+            {% endfor %}
+          </div>
+          <button type="submit" class="btn btn-amber">Update Categories</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function setProfileAvatar(id, element) {
+    document.getElementById('profile_avatar_id').value = id;
+    document.querySelectorAll('.avatar-opt').forEach(img => img.classList.remove('selected'));
+    element.classList.add('selected');
+  }
+</script>
+
+<style>
+  /* Logic for category chips toggle */
+  .cat-chip input:checked + label { background: #BA7517; border-color: #BA7517; color: #fff; }
+</style>
+
+{% endblock %}

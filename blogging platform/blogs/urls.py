@@ -1,0 +1,32 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('home/', views.home),
+    path('blog/<int:blog_id>/', views.blog_detail),
+    path('like/<int:blog_id>/', views.like_blog),
+    path('comment/<int:blog_id>/', views.add_comment),
+    path('follow/<int:author_id>/<int:blog_id>/', views.follow_author),
+    path('bookmark/<int:blog_id>/', views.bookmark_blog),
+    path('library/', views.library),
+    path('write/', views.write),
+    path('stories/', views.stories),
+    path('search/', views.search),
+    path('publications/', views.publications_list),
+    path('publication/<int:publi_id>/', views.publication_detail),
+    path('create_publication/', views.create_publication),
+    path('follow-publication/<int:publi_id>/', views.follow_publication),
+    path('owner-dashboard/', views.owner_dashboard),
+    path('join-request/<int:publi_id>/', views.join_request),
+    path('handle-request/<int:request_id>/<str:action>/', views.handle_request),
+    path('author/<int:author_id>/', views.author_blogs),
+    path('edit-draft/<int:blog_id>/', views.edit_draft),
+    path('delete-draft/<int:blog_id>/', views.delete_draft),
+    path('donate/<int:blog_id>/', views.donate),
+    path('donations/', views.author_donations),
+    path('subscribe/', views.subscribe),
+    path('subscriptions/', views.subscriptions),
+    path('delete/<int:blog_id>/', views.delete_blog),
+    path('publications/<int:publi_id>/', views.publication_detail, name='publication_detail'),
+    path('transfer-ownership/<int:publi_id>/', views.transfer_ownership),
+]

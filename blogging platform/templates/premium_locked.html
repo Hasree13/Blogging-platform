@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  .premium-wrapper { max-width: 600px; margin: 0 auto; padding: 4rem 1.5rem; }
+
+  .premium-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    border: 1px solid #f0d89a;
+    background: #fffbf2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .premium-icon { font-size: 52px; line-height: 1; }
+
+  .premium-card h2 {
+    font-size: 22px; font-weight: 700; color: #7a5500; margin: 0;
+  }
+
+  .premium-card p {
+    font-size: 14px; color: #a06c00; line-height: 1.6; margin: 0;
+  }
+
+  .premium-divider { width: 48px; height: 2px; background: #f0d89a; border-radius: 2px; }
+
+  .premium-perks {
+    display: flex; flex-direction: column; gap: 8px;
+    width: 100%; text-align: left;
+    background: #fff; border-radius: 12px;
+    border: 1px solid #f0d89a;
+    padding: 1rem 1.25rem;
+  }
+  .perk-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: #7a5500; font-weight: 500;
+  }
+  .perk-icon { font-size: 15px; flex-shrink: 0; }
+
+  .premium-actions {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    justify-content: center; margin-top: 0.5rem;
+  }
+
+  .btn-subscribe {
+    padding: 11px 28px;
+    background: #c28a2e; color: #fff;
+    border-radius: 10px;
+    font-size: 14px; font-weight: 600;
+    text-decoration: none;
+    transition: opacity .15s;
+    display: inline-block;
+  }
+  .btn-subscribe:hover { opacity: .88; }
+
+  .btn-back-home {
+    padding: 11px 20px;
+    background: #f0f0f0; color: #555;
+    border-radius: 10px;
+    font-size: 14px; font-weight: 600;
+    text-decoration: none;
+    transition: opacity .15s;
+    display: inline-block;
+  }
+  .btn-back-home:hover { opacity: .8; }
+</style>
+
+<div class="premium-wrapper">
+  <div class="premium-card">
+
+    <div class="premium-icon">🔒</div>
+
+    <h2>This is Premium Content</h2>
+
+    <p>This blog is exclusively available to premium members.<br>Upgrade your account to unlock it and much more.</p>
+
+    <div class="premium-divider"></div>
+
+    <div class="premium-perks">
+      <div class="perk-item"><span class="perk-icon">⭐</span> Access all premium blogs</div>
+      <div class="perk-item"><span class="perk-icon">✍️</span> Support your favourite authors</div>
+      <div class="perk-item"><span class="perk-icon">🔔</span> Exclusive content updates</div>
+    </div>
+
+    <div class="premium-actions">
+      <a href="/subscribe/" class="btn-subscribe">⭐ Become Premium</a>
+      <a href="/home/" class="btn-back-home">← Back to Home</a>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
