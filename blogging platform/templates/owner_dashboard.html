@@ -1,0 +1,425 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  .pub-detail-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ── Publication header card ── */
+  .pub-header-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.75rem;
+    border: 1px solid #e5e0d5;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .pub-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: #c28a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .pub-header-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .pub-followers-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #f0ece3;
+    color: #555;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-top: 6px;
+  }
+
+  /* ── Section title ── */
+  .pub-section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 1.25rem;
+    margin-top: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .pub-section-title:first-of-type {
+    margin-top: 0;
+  }
+
+  .pub-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+
+  .badge-authors {
+    background: #fef3e2;
+    color: #a06c00;
+  }
+
+  .badge-blogs {
+    background: #eaf6ea;
+    color: #2e7d32;
+  }
+
+  .badge-requests {
+    background: #fde8e8;
+    color: #b03030;
+  }
+
+  /* ── Grid ── */
+  .pub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+  }
+
+  /* ── Card ── */
+  .pub-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid transparent;
+    transition: transform .18s, box-shadow .18s;
+  }
+
+  .pub-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .10);
+    border-color: #e5e0d5;
+  }
+
+  .pub-card-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    width: fit-content;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+
+  .tag-author {
+    background: #fef3e2;
+    color: #a06c00;
+  }
+
+  .tag-blog {
+    background: #eaf6ea;
+    color: #2e7d32;
+  }
+
+  .tag-request {
+    background: #fde8e8;
+    color: #b03030;
+  }
+
+  /* Author card avatar row */
+  .author-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .pub-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #c28a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .author-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  /* Blog card title */
+  .pub-blog-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  /* Request card */
+  .request-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .request-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .btn-accept {
+    padding: 6px 16px;
+    border-radius: 8px;
+    background: #eaf6ea;
+    color: #2e7d32;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity .15s;
+  }
+
+  .btn-reject {
+    padding: 6px 16px;
+    border-radius: 8px;
+    background: #fde8e8;
+    color: #b03030;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity .15s;
+  }
+
+  .btn-accept:hover,
+  .btn-reject:hover {
+    opacity: .8;
+  }
+
+  /* Empty */
+  .pub-empty {
+    grid-column: 1 / -1;
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem 1rem;
+    text-align: center;
+    color: #aaa;
+    font-size: 14px;
+  }
+
+  .pub-divider {
+    height: 1px;
+    background: #ddd8ce;
+    margin: 2rem 0 0;
+  }
+
+  /* Premium Solid Red Button - perfectly matches your btn-amber styling */
+  .btn-delete-solid {
+      background-color: #ef4444; /* Clean, modern red */
+      color: #ffffff;
+      border: none;
+      height: 34px;
+      padding: 0 16px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+  }
+  
+  .btn-delete-solid:hover {
+      background-color: #dc2626; /* Darker red on hover */
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+  }
+</style>
+
+<div class="pub-detail-wrapper">
+
+  <!-- Publication Header -->
+  <div class="pub-header-card">
+    <div class="pub-icon">📰</div>
+    <div>
+      <div class="pub-header-title">{{ pub.1 }}</div>
+      <div class="pub-followers-pill">👥 {{ followers }} Followers</div>
+    </div>
+  </div>
+
+  <!-- Authors -->
+  <div class="pub-section-title">
+    Authors <span class="pub-badge badge-authors">✍️ Team</span>
+  </div>
+  <div class="pub-grid">
+    {% for a in authors %}
+    <div class="pub-card">
+      <span class="pub-card-tag tag-author">✍️ Author</span>
+      <div class="author-row">
+        <div class="pub-avatar">{{ a.0|slice:":1"|upper }}{{ a.1|slice:":1"|upper }}</div>
+        <div class="author-name">{{ a.0 }} {{ a.1 }}</div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="pub-empty">No authors yet.</div>
+    {% endfor %}
+  </div>
+
+  <div class="pub-divider"></div>
+
+  <!-- Blogs -->
+  <div class="pub-section-title" style="margin-top:2.5rem;">
+    Blogs <span class="pub-badge badge-blogs">✅ Published</span>
+  </div>
+  <div class="pub-grid">
+    {% for b in blogs %}
+    <div class="pub-card">
+      <span class="pub-card-tag tag-blog">📝 Blog</span>
+      <div class="pub-blog-title">{{ b.1 }}</div>
+    </div>
+    {% empty %}
+    <div class="pub-empty">No blogs published yet.</div>
+    {% endfor %}
+  </div>
+
+  <div class="pub-divider"></div>
+
+  <!-- Join Requests -->
+  <div class="pub-section-title" style="margin-top:2.5rem;">
+    Join Requests <span class="pub-badge badge-requests">⏳ Pending</span>
+  </div>
+  <div class="pub-grid">
+    {% for r in requests %}
+    <div class="pub-card">
+      <span class="pub-card-tag tag-request">⏳ Pending</span>
+      <div class="author-row">
+        <div class="pub-avatar">{{ r.1|slice:":1"|upper }}{{ r.2|slice:":1"|upper }}</div>
+        <div class="request-name">{{ r.1 }} {{ r.2 }}</div>
+      </div>
+      <div class="request-actions">
+        <a class="btn-accept" href="/handle-request/{{ r.0 }}/accept/">✓ Accept</a>
+        <a class="btn-reject" href="/handle-request/{{ r.0 }}/reject/">✕ Reject</a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="pub-empty">No pending join requests.</div>
+    {% endfor %}
+  </div>
+
+  {% if user_id == owner_id %}
+
+  <h3 style="margin-top:20px;">Transfer Ownership</h3>
+
+  <form method="POST" action="/transfer-ownership/{{ pub.0 }}/"
+    onsubmit="return confirm('Are you sure you want to transfer ownership?');">
+
+    {% csrf_token %}
+
+    <select name="new_owner" required style="padding:8px; border-radius:6px; margin-right:10px;">
+
+      {% for author in authors %}
+      {% if author.2 != user_id %}
+      <option value="{{ author.2 }}">
+        {{ author.0 }} {{ author.1 }}
+      </option>
+      {% endif %}
+      {% endfor %}
+
+    </select>
+
+    <button type="submit" style="padding:8px 14px; background:#c28a2e; color:#fff; border:none; border-radius:6px;">
+      Transfer
+    </button>
+
+  </form>
+
+  <!-- ── REFINED DANGER ZONE ── -->
+<div style="
+  margin-top: 2.5rem;
+  border: 1px solid #f1d5d5;
+  background: #fff7f7;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+">
+
+  <div style="max-width: 520px;">
+    
+    <h4 style="
+      margin: 0 0 6px 0;
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a1a;
+    ">
+      Delete Publication
+    </h4>
+
+    <p style="
+      margin: 0;
+      font-size: 13px;
+      color: #777;
+      line-height: 1.6;
+    ">
+      Permanently delete <strong>{{ pub.1 }}</strong>. All authors, followers, and requests will be removed. This action cannot be undone.
+    </p>
+  </div>
+
+  <form action="{% url 'delete_publication' pub.0 %}" method="POST"
+        onsubmit="return confirm('Are you absolutely sure you want to permanently delete {{ pub.1 }}?');"
+        style="margin: 0;">
+    {% csrf_token %}
+
+    <button type="submit" style="
+      background: #dc2626;
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    "
+    onmouseover="this.style.background='#b91c1c'; this.style.transform='translateY(-1px)'"
+    onmouseout="this.style.background='#dc2626'; this.style.transform='translateY(0)'">
+      Delete
+    </button>
+
+  </form>
+
+</div>
+
+  {% endif %}
+
+
+</div>
+
+{% endblock %}
