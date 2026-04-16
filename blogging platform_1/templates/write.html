@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    .container {
+        max-width: 700px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 8px;
+        margin-bottom: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+    }
+
+    input[name="title"] {
+        width: 100%;
+        padding: 10px;
+        margin-top: 8px;
+        margin-bottom: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        resize: vertical;
+        width: 100%;
+        padding: 10px;
+        margin-top: 8px;
+        margin-bottom: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+    }
+
+    .section {
+        margin-bottom: 20px;
+    }
+
+    button {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+
+    .publish-btn {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .draft-btn {
+        background-color: #ddd;
+    }
+
+    /* ── Checkbox alignment fix ── */
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        font-size: 15px;
+        line-height: 1.4;
+        margin-bottom: 10px;
+        user-select: none;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+        width: 17px;
+        height: 17px;
+        margin: 0;
+        flex-shrink: 0;
+        cursor: pointer;
+        accent-color: #c28a2e;
+    }
+
+    /* Premium toggle card */
+    .premium-toggle {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #fffbf2;
+        border: 1px solid #f0d89a;
+        border-radius: 10px;
+        padding: 12px 16px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+        color: #7a5500;
+        user-select: none;
+    }
+
+    .premium-toggle input[type="checkbox"] {
+        width: 17px;
+        height: 17px;
+        margin: 0;
+        flex-shrink: 0;
+        cursor: pointer;
+        accent-color: #c28a2e;
+    }
+
+    .premium-toggle .star {
+        font-size: 18px;
+    }
+
+    /* Category list */
+    .category-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 10px;
+    }
+
+    /* Container for the pills */
+    .pill-group {
+        display: flex;
+        flex-wrap: wrap;
+        /* Allows pills to wrap to new lines */
+        gap: 12px;
+        /* Balanced spacing between pills */
+        margin-top: 15px;
+    }
+
+    /* Individual Pill Style */
+    .pill-label {
+        display: inline-block;
+        padding: 10px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 50px;
+        /* Fully rounded "pill" shape */
+        background-color: #fff;
+        color: #555;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        /* Smooth hover and click effect */
+        user-select: none;
+    }
+
+    /* Hover State */
+    .pill:hover .pill-label {
+        border-color: #BA7517;
+        background-color: #fff9f0;
+    }
+
+    /* Selected/Checked State */
+    input:checked+.pill-label {
+        background-color: #BA7517;
+        /* Matches your brand accent */
+        border-color: #BA7517;
+        color: #fff;
+        box-shadow: 0 4px 6px rgba(186, 117, 23, 0.2);
+    }
+</style>
+
+<div class="container">
+    <h2>Write a Blog</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Title -->
+        <input name="title" placeholder="Enter title" value="">
+
+        <!-- Content -->
+        <textarea name="content" rows="10" placeholder="Write your story..."></textarea>
+
+        <!-- Premium Toggle -->
+        <div class="section">
+            <label class="premium-toggle">
+                <input type="checkbox" name="is_premium">
+                <span class="star">⭐</span>
+                Make this a Premium Blog
+            </label>
+        </div>
+
+        <!-- Categories -->
+        <div class="section">
+            <h4>Select Categories</h4>
+            <div class="pill-group">
+                {% for category in categories %}
+                <label class="pill">
+                    <input type="checkbox" name="categories" value="{{ category.0 }}" {% if category.0 in selected %} checked {% endif %} hidden>
+
+                    <span class="pill-label">{{ category.1 }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <button class="publish-btn" name="action" value="publish">Publish</button>
+        <button class="draft-btn" name="action" value="draft">Save Draft</button>
+
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  .blog-detail-wrapper { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  /* ── Top meta card ── */
+  .blog-meta-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e5e0d5;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .blog-title { font-size: 26px; font-weight: 700; color: #1a1a1a; line-height: 1.3; }
+
+  .blog-author-row { display: flex; align-items: center; gap: 10px; }
+  
+  /* UPDATED: Author Avatar with Image Support */
+  .blog-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #f0ece3;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: #c28a2e; flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid #e5e0d5;
+  }
+  .blog-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+  .blog-author-link { font-size: 14px; font-weight: 600; color: #c28a2e; text-decoration: none; }
+  .blog-author-link:hover { text-decoration: underline; }
+  .blog-date { font-size: 12px; color: #aaa; }
+
+  /* ── Tags row ── */
+  .blog-tags-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .blog-category-tag { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; background: #f0ece3; color: #666; text-decoration: none; }
+  .blog-premium-tag { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; background: #fef3e2; color: #a06c00; }
+
+  /* ── Action buttons row ── */
+  .blog-actions-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .action-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: opacity .15s, transform .1s; }
+  .action-btn:hover { opacity: .85; transform: translateY(-1px); }
+  .btn-follow { background: #1a1a1a; color: #fff; }
+  .btn-unfollow { background: #f0f0f0; color: #555; }
+  .btn-bookmark { background: #fef3e2; color: #a06c00; }
+  .btn-unbookmark { background: #f0f0f0; color: #555; }
+  .btn-like { background: #fde8e8; color: #b03030; }
+  .btn-unlike { background: #f0f0f0; color: #555; }
+  .btn-delete { background: #fde8e8; color: #b03030; border: none; }
+  .likes-count { font-size: 13px; font-weight: 600; color: #555; display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; background: #f0f0f0; border-radius: 10px; }
+
+  /* ── Blog body ── */
+  .blog-body-card { background: #fff; border-radius: 16px; padding: 2rem 1.75rem; margin-bottom: 1.5rem; border: 1px solid #e5e0d5; font-size: 16px; color: #333; line-height: 1.8; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
+
+  /* ── Donate card ── */
+  .donate-card { background: #fff; border-radius: 16px; padding: 1.5rem 1.75rem; margin-bottom: 1.5rem; border: 1px solid #f0d89a; background: #fffbf2; }
+  .donate-card h3 { font-size: 17px; font-weight: 700; color: #7a5500; margin-bottom: 1rem; }
+  .donate-row { display: flex; gap: 10px; align-items: center; }
+  .donate-row input { flex: 1; padding: 9px 14px; border: 1px solid #f0d89a; border-radius: 10px; font-size: 14px; background: #fff; outline: none; }
+  .donate-row input:focus { border-color: #c28a2e; }
+  .btn-donate { padding: 9px 20px; border-radius: 10px; background: #c28a2e; color: #fff; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: opacity .15s; }
+  .btn-donate:hover { opacity: .88; }
+
+  /* ── Comments card ── */
+  .comments-card { background: #fff; border-radius: 16px; padding: 1.5rem 1.75rem; border: 1px solid #e5e0d5; }
+  .comments-card h3 { font-size: 17px; font-weight: 700; color: #1a1a1a; margin-bottom: 1.25rem; }
+  .comment-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f0ece3; }
+  .comment-item:last-of-type { border-bottom: none; }
+  
+  /* UPDATED: Comment Avatar */
+  .comment-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #f0ece3;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #c28a2e; flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid #e5e0d5;
+  }
+  .comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+  .comment-author { font-size: 12px; font-weight: 700; color: #333; margin-bottom: 2px; }
+  .comment-text { font-size: 13px; color: #555; line-height: 1.5; }
+
+  /* ── Add comment form ── */
+  .comment-form { display: flex; gap: 10px; margin-top: 1.25rem; align-items: center; }
+  .comment-form input { flex: 1; padding: 9px 14px; border: 1px solid #e5e0d5; border-radius: 10px; font-size: 14px; outline: none; }
+  .comment-form input:focus { border-color: #c28a2e; }
+  .btn-comment { padding: 9px 18px; border-radius: 10px; background: #1a1a1a; color: #fff; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: opacity .15s; white-space: nowrap; }
+  .btn-comment:hover { opacity: .85; }
+
+  /* Premium Content */
+  .premium-container { position: relative; }
+  .fade-wrapper { max-height: 140px; overflow: hidden; position: relative; font-size: 16px; line-height: 1.8; color: #333; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
+  .fade-wrapper::after { content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 80px; background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8), #fff); }
+  .premium-cta { text-align: center; margin-top: 16px; }
+  .premium-cta h3 { font-size: 20px; font-weight: 700; color: #7a5500; }
+  .premium-cta p { font-size: 14px; color: #a06c00; margin: 6px 0 14px; }
+  .btn-premium { display: inline-block; padding: 10px 24px; background: #c28a2e; color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600; transition: transform 0.15s, opacity 0.15s; }
+  .btn-premium:hover { transform: translateY(-2px); opacity: 0.9; }
+
+  .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); z-index:1000; justify-content:center; align-items:center; }
+.modal-box { background:#fff; width:90%; max-width:450px; border-radius:12px; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.2); animation:popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes popIn { from { transform:scale(0.9); opacity:0; } to { transform:scale(1); opacity:1; } }
+.modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
+.modal-header h3 { margin:0; font-family:'Inter', sans-serif; color:#1a1612; }
+.close-btn { background:none; border:none; font-size:24px; cursor:pointer; color:#999; }
+.modal-sub { font-size:13px; color:#666; margin-bottom:15px; }
+.radio-group { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+.radio-group label { font-size:14px; color:#333; display:flex; align-items:center; gap:8px; cursor:pointer; }
+#reportDesc { width:100%; border:1px solid #ddd; border-radius:8px; padding:10px; font-family:'Inter', sans-serif; font-size:13px; resize:none; margin-bottom:20px; box-sizing:border-box;}
+.btn-submit-report { width:100%; background:#dc2626; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:600; cursor:pointer; transition:0.2s; }
+.btn-submit-report:hover { background:#b91c1c; }
+</style>
+
+<div class="blog-detail-wrapper">
+
+  <div class="blog-meta-card">
+    <div class="blog-title">{{ blog.1 }}</div>
+
+    <div class="blog-author-row">
+      <div class="blog-avatar">
+        {% if blog.9 %} <img src="/static/avatars/avatar_{{ blog.9 }}.png" alt="Avatar">
+        {% else %}
+          {{ blog.4|slice:":1"|upper }}{{ blog.5|slice:":1"|upper }}
+        {% endif %}
+      </div>
+      <div>
+        <a class="blog-author-link" href="/author/{{ blog.3 }}/">{{ blog.4 }} {{ blog.5 }}</a>
+        <div class="blog-date">
+          Published on {{ blog.6 }}
+          {% if blog.7 %} &nbsp;·&nbsp; {{ blog.7 }}{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="blog-tags-row">
+      {% for c in categories %}
+        <span class="blog-category-tag">#{{ c.0 }}</span>
+      {% endfor %}
+      {% if is_premium %}
+        <span class="blog-premium-tag">⭐ Premium</span>
+      {% endif %}
+    </div>
+
+    <div class="blog-actions-row">
+      <a class="action-btn {% if followed %}btn-unfollow{% else %}btn-follow{% endif %}"
+         href="/follow-author/{{ blog.3 }}">
+        {% if followed %}✓ Unfollow{% else %}+ Follow Author{% endif %}
+      </a>
+
+      <a class="action-btn {% if bookmarked %}btn-unbookmark{% else %}btn-bookmark{% endif %}"
+         href="/bookmark/{{ blog.0 }}">
+        {% if bookmarked %}🔖 Remove Bookmark{% else %}🔖 Bookmark{% endif %}
+      </a>
+
+      <a class="action-btn {% if liked %}btn-unlike{% else %}btn-like{% endif %}"
+         href="/like/{{ blog.0 }}">
+        {% if liked %}♡ Unlike{% else %}♡ Like{% endif %}
+      </a>
+
+      <span class="likes-count">♡ {{ likes }}</span>
+
+      {% if user_id == blog.3 %}
+      <form method="POST" action="/delete/{{ blog.0 }}/"
+            onsubmit="return confirm('Are you sure you want to delete this blog?');"
+            style="margin:0;">
+        {% csrf_token %}
+        <button type="submit" class="action-btn btn-delete">🗑 Delete Blog</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="blog-body-card premium-container">
+    {% if is_premium and not is_subscribed %}
+      <div class="fade-wrapper">
+        {{ blog.2 }}
+      </div>
+      <div class="premium-cta">
+        <h3>🔒 Continue Reading</h3>
+        <p>Unlock full story with premium access.</p>
+        <a href="/subscribe/" class="btn-premium">✨ Become Premium</a>
+      </div>
+    {% else %}
+      {{ blog.2 }}
+    {% endif %}
+  </div>
+
+  {% if show_donate %}
+  <div class="donate-card">
+    <h3>❤️ Support the Author</h3>
+    <form method="POST" action="/donate/{{ blog.0 }}/">
+      {% csrf_token %}
+      <div class="donate-row">
+        <input type="number" name="amount" placeholder="Enter amount" required value="">
+        <button type="submit" class="btn-donate">Donate</button>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+
+  <div class="comments-card">
+    <h3>💬 Comments</h3>
+
+    {% for c in comments %}
+    <div class="comment-item">
+      <div class="comment-avatar">
+        {% if c.2 %} <img src="/static/avatars/avatar_{{ c.2 }}.png" alt="User">
+        {% else %}
+          {{ c.1|slice:":1"|upper }}
+        {% endif %}
+      </div>
+      <div>
+        <div class="comment-author">{{ c.1 }}</div>
+        <div class="comment-text">{{ c.0 }}</div>
+      </div>
+    </div>
+    {% empty %}
+    <p style="color:#aaa; font-size:14px;">No comments yet. Be the first!</p>
+    {% endfor %}
+
+    {% if is_subscribed or not is_premium %}
+    <form method="POST" action="/comment/{{ blog.0 }}/" class="comment-form">
+      {% csrf_token %}
+      <input name="content" placeholder="Write a comment..." value="">
+      <button type="submit" class="btn-comment">Post</button>
+    </form>
+    {% endif %}
+
+    <button onclick="document.getElementById('reportModal').style.display='flex'" 
+        style="background:none; border:none; color:#999; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:5px; transition:0.2s;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+    Report
+    </button>
+
+    <div id="reportModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Report this Blog</h3>
+            <button onclick="document.getElementById('reportModal').style.display='none'" class="close-btn">&times;</button>
+        </div>
+        
+        <form action="{% url 'report_blog' blog.0 %}" method="POST" onsubmit="return validateReport()">
+            {% csrf_token %}
+            <p class="modal-sub">Why are you reporting this content?</p>
+            
+            <div class="radio-group">
+                <label><input type="radio" name="report_type" value="Spam" required> Spam or Misleading</label>
+                <label><input type="radio" name="report_type" value="Abusive"> Abusive or Hateful Content</label>
+                <label><input type="radio" name="report_type" value="Plagiarism"> Plagiarism / Copyright</label>
+                <label><input type="radio" name="report_type" value="AI-Generated"> Unmarked AI-Generated Content</label>
+                <label><input type="radio" name="report_type" value="Other" id="optOther"> Other</label>
+            </div>
+
+            <textarea name="description" id="reportDesc" placeholder="Please provide more details (required if 'Other' is selected)..." rows="3"></textarea>
+            
+            <button type="submit" class="btn-submit-report">Submit Report</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function validateReport() {
+    if (document.getElementById('optOther').checked && document.getElementById('reportDesc').value.trim() === '') {
+        alert('Please provide a description for the "Other" category.');
+        return false;
+    }
+    return true;
+}
+</script>
+
+  </div>
+
+</div>
+{% endblock %}
