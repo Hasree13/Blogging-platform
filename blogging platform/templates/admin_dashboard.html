@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  .admin-wrap { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; font-family: 'Inter', sans-serif; }
+  .admin-header { margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 1rem; }
+  .admin-header h1 { font-size: 26px; font-weight: 700; color: #111; margin:0; display:flex; align-items:center; gap:10px;}
+  
+  .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .full-width { grid-column: 1 / -1; }
+  
+  .admin-panel { background: #fff; border: 1px solid #e5e0d5; border-radius: 12px; overflow: hidden; }
+  .panel-head { background: #faf9f7; padding: 1rem 1.5rem; border-bottom: 1px solid #e5e0d5; font-weight: 600; color: #1a1612; display:flex; justify-content:space-between; align-items:center;}
+  
+  .table-wrap { max-height: 350px; overflow-y: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; text-align:left; }
+  th { position: sticky; top: 0; background: #fff; padding: 10px 15px; color: #888; font-weight: 500; border-bottom: 1px solid #eee; }
+  td { padding: 12px 15px; border-bottom: 1px solid #f9f8f6; color: #333; }
+  tr:hover td { background: #faf9f7; }
+
+  .badge-new { background: #fee2e2; color: #dc2626; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  
+  .btn-action { text-decoration:none; padding: 5px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; transition:0.2s; border:none; cursor:pointer;}
+  .btn-resolve { background: #dcfce7; color: #16a34a; }
+  .btn-resolve:hover { background: #bbf7d0; }
+  .btn-del { background: #fee2e2; color: #dc2626; }
+  .btn-del:hover { background: #fecaca; }
+</style>
+
+<div class="admin-wrap">
+    <div class="admin-header">
+        <h1>🛡️ Super Admin Dashboard</h1>
+        <p style="color:#666; margin-top:5px; font-size:14px;">Monitor reports and manage platform integrity.</p>
+    </div>
+
+    <div class="admin-grid">
+
+        <div class="admin-panel full-width">
+            <div class="panel-head">🚨 Pending Reports</div>
+            <div class="table-wrap">
+                <table>
+                    <tr><th>Date</th><th>Blog</th><th>Reported By</th><th>Type</th><th>Details</th><th>Action</th></tr>
+                    {% for r in reports %}
+                    <tr>
+                        <td style="white-space:nowrap; color:#888;">{{ r.6|date:"M d, y" }}</td>
+                        <td><a href="/blog/{{ r.7 }}/" style="color:#BA7517; text-decoration:none; font-weight:500;">{{ r.1|truncatechars:35 }}</a></td>
+                        <td>{{ r.2 }} {{ r.3 }}</td>
+                        <td><span class="badge-new">{{ r.4 }}</span></td>
+                        <td style="color:#666; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ r.5|default:"-" }}</td>
+                        <td>
+                            <form action="{% url 'admin_action' 'resolve_report' r.0 %}" method="POST" style="margin:0;">
+                                {% csrf_token %} <button type="submit" class="btn-action btn-resolve">Mark Solved</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" style="text-align:center; padding:2rem; color:#999;">No pending reports! 🎉</td></tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+        <div class="admin-panel">
+            <div class="panel-head">📰 Manage Blogs</div>
+            <div class="table-wrap">
+                <table>
+                    <tr><th>ID</th><th>Title</th><th>Action</th></tr>
+                    {% for b in blogs %}
+                    <tr>
+                        <td>#{{ b.0 }}</td>
+                        <td><a href="/blog/{{ b.0 }}/" style="color:#111; text-decoration:none;">{{ b.1|truncatechars:40 }}</a></td>
+                        <td style="text-align:right;">
+                            <form action="{% url 'admin_action' 'delete_blog' b.0 %}" method="POST" onsubmit="return confirm('Delete this blog?');" style="margin:0;">
+                                {% csrf_token %} <button class="btn-action btn-del">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+        <div class="admin-panel">
+            <div class="panel-head">👥 Manage Users</div>
+            <div class="table-wrap">
+                <table>
+                    <tr><th>User</th><th>Email</th><th>Action</th></tr>
+                    {% for u in users %}
+                    <tr>
+                        <td style="font-weight:500;">{{ u.1 }} {{ u.2 }}</td>
+                        <td style="color:#666;">{{ u.3 }}</td>
+                        <td style="text-align:right;">
+                            <form action="{% url 'admin_action' 'delete_user' u.0 %}" method="POST" onsubmit="return confirm('EXTREME DANGER: Delete user and all their data?');" style="margin:0;">
+                                {% csrf_token %} <button class="btn-action btn-del">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+        <div class="admin-panel">
+            <div class="panel-head">🏢 Manage Publications</div>
+            <div class="table-wrap">
+                <table>
+                    <tr><th>ID</th><th>Publication Name</th><th>Action</th></tr>
+                    {% for p in pubs %}
+                    <tr>
+                        <td>#{{ p.0 }}</td>
+                        <td style="font-weight:500;">{{ p.1 }}</td>
+                        <td style="text-align:right;">
+                            <form action="{% url 'admin_action' 'delete_pub' p.0 %}" method="POST" onsubmit="return confirm('Delete this publication?');" style="margin:0;">
+                                {% csrf_token %} <button class="btn-action btn-del">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+        <div class="admin-panel">
+            <div class="panel-head">💬 Recent Comments</div>
+            <div class="table-wrap">
+                <table>
+                    <tr><th>User</th><th>Comment</th><th>Action</th></tr>
+                    {% for c in comments %}
+                    <tr>
+                        <td style="font-weight:500; white-space:nowrap;">{{ c.2 }}</td>
+                        <td style="color:#555;">{{ c.1|truncatechars:45 }}</td>
+                        <td style="text-align:right;">
+                            <form action="{% url 'admin_action' 'delete_comment' c.0 %}" method="POST" onsubmit="return confirm('Delete comment?');" style="margin:0;">
+                                {% csrf_token %} <button class="btn-action btn-del">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

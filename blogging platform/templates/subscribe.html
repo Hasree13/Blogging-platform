@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  .plan-wrapper { max-width: 700px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+
+  .plan-section-title {
+    font-size: 22px; font-weight: 700; color: #1a1a1a;
+    margin-bottom: 0.5rem; text-align: center;
+  }
+  .plan-subtitle {
+    font-size: 14px; color: #aaa; text-align: center; margin-bottom: 2rem;
+  }
+
+  .plan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem;
+  }
+
+  /* ── Plan card ── */
+  .plan-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.75rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border: 1px solid #e5e0d5;
+    transition: transform .18s, box-shadow .18s;
+  }
+  .plan-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.10);
+  }
+
+  /* Featured / recommended card */
+  .plan-card.featured {
+    border: 2px solid #c28a2e;
+    position: relative;
+  }
+  .plan-recommended {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: #c28a2e; color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 14px; border-radius: 20px;
+    white-space: nowrap; letter-spacing: .4px; text-transform: uppercase;
+  }
+
+  .plan-icon { font-size: 32px; }
+  .plan-name { font-size: 17px; font-weight: 700; color: #1a1a1a; }
+  .plan-price {
+    font-size: 30px; font-weight: 700; color: #1a1a1a; line-height: 1;
+  }
+  .plan-price span { font-size: 14px; font-weight: 400; color: #aaa; }
+
+  .plan-perks {
+    display: flex; flex-direction: column; gap: 7px;
+    padding: 1rem; background: #f9f7f3;
+    border-radius: 10px;
+  }
+  .plan-perk {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: #555;
+  }
+  .plan-perk .perk-icon { font-size: 14px; flex-shrink: 0; }
+
+  .plan-savings {
+    font-size: 12px; font-weight: 600;
+    color: #2e7d32; background: #eaf6ea;
+    padding: 4px 12px; border-radius: 20px;
+    width: fit-content;
+  }
+
+  /* Submit button */
+  .btn-plan {
+    width: 100%; padding: 11px;
+    border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: opacity .15s;
+    margin-top: auto;
+  }
+  .btn-plan.primary   { background: #c28a2e; color: #fff; }
+  .btn-plan.secondary { background: #f0f0f0; color: #555; }
+  .btn-plan:hover { opacity: .88; }
+</style>
+
+<div class="plan-wrapper">
+
+  <div class="plan-section-title">⭐ Choose Your Plan</div>
+  <div class="plan-subtitle">Unlock premium blogs and support your favourite authors.</div>
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="plan-grid">
+
+      <!-- Monthly -->
+      <div class="plan-card">
+        <div class="plan-icon">📅</div>
+        <div class="plan-name">Monthly</div>
+        <div class="plan-price">₹199 <span>/ month</span></div>
+        <div class="plan-perks">
+          <div class="plan-perk"><span class="perk-icon">⭐</span> Access all premium blogs</div>
+          <div class="plan-perk"><span class="perk-icon">✍️</span> Support authors via donations</div>
+          <div class="plan-perk"><span class="perk-icon">🔔</span> Exclusive content updates</div>
+        </div>
+        <button class="btn-plan secondary" name="plan" value="monthly">Get Monthly</button>
+      </div>
+
+      <!-- Yearly -->
+      <div class="plan-card featured">
+        <span class="plan-recommended">Best Value</span>
+        <div class="plan-icon">🗓️</div>
+        <div class="plan-name">Yearly</div>
+        <div class="plan-price">₹1,999 <span>/ year</span></div>
+        <div class="plan-savings">Save ₹389 vs monthly</div>
+        <div class="plan-perks">
+          <div class="plan-perk"><span class="perk-icon">⭐</span> Access all premium blogs</div>
+          <div class="plan-perk"><span class="perk-icon">✍️</span> Support authors via donations</div>
+          <div class="plan-perk"><span class="perk-icon">🔔</span> Exclusive content updates</div>
+        </div>
+        <button class="btn-plan primary" name="plan" value="yearly">Get Yearly</button>
+      </div>
+
+    </div>
+  </form>
+
+</div>
+
+{% endblock %}
