@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  .sub-wrapper { max-width: 700px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+
+  /* ── Active subscription card ── */
+  .sub-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.75rem;
+    border: 1px solid #e5e0d5;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .sub-card-header { display: flex; align-items: center; gap: 12px; }
+  .sub-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: #c28a2e;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .sub-card-title { font-size: 20px; font-weight: 700; color: #1a1a1a; }
+  .sub-card-sub   { font-size: 13px; color: #aaa; margin-top: 2px; }
+
+  /* Status pill */
+  .sub-status-active  { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; border-radius:20px; font-size:13px; font-weight:600; background:#eaf6ea; color:#2e7d32; }
+  .sub-status-expired { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; border-radius:20px; font-size:13px; font-weight:600; background:#fde8e8; color:#b03030; }
+
+  /* Details grid */
+  .sub-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    background: #f9f7f3;
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+  .sub-detail-item { display: flex; flex-direction: column; gap: 3px; }
+  .sub-detail-label { font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: .4px; }
+  .sub-detail-value { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+
+  /* ── No subscription ── */
+  .nosub-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem 1.75rem;
+    border: 1px solid #e5e0d5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .nosub-icon { font-size: 44px; }
+  .nosub-title { font-size: 20px; font-weight: 700; color: #1a1a1a; }
+  .nosub-desc  { font-size: 14px; color: #aaa; line-height: 1.6; }
+
+  /* Plan cards */
+  .plan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+  }
+  .plan-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border: 1px solid #e5e0d5;
+    transition: transform .18s, box-shadow .18s;
+    position: relative;
+  }
+  .plan-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.10); }
+  .plan-card.featured { border: 2px solid #c28a2e; }
+  .plan-recommended {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: #c28a2e; color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 14px; border-radius: 20px;
+    white-space: nowrap; letter-spacing: .4px; text-transform: uppercase;
+  }
+  .plan-icon  { font-size: 28px; }
+  .plan-name  { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+  .plan-price { font-size: 26px; font-weight: 700; color: #1a1a1a; line-height: 1; }
+  .plan-price span { font-size: 13px; font-weight: 400; color: #aaa; }
+  .plan-savings {
+    font-size: 12px; font-weight: 600; color: #2e7d32;
+    background: #eaf6ea; padding: 4px 12px;
+    border-radius: 20px; width: fit-content;
+  }
+  .plan-perks { display: flex; flex-direction: column; gap: 6px; background: #f9f7f3; border-radius: 10px; padding: 0.875rem; }
+  .plan-perk  { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555; }
+  .perk-icon  { font-size: 14px; flex-shrink: 0; }
+  .btn-plan {
+    width: 100%; padding: 11px; border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: opacity .15s; margin-top: auto;
+  }
+  .btn-plan.primary   { background: #c28a2e; color: #fff; }
+  .btn-plan.secondary { background: #f0f0f0; color: #555; }
+  .btn-plan:hover { opacity: .88; }
+</style>
+
+<div class="sub-wrapper">
+
+  {% if sub %}
+
+  <!-- Active / Expired Subscription -->
+  <div class="sub-card">
+
+    <div class="sub-card-header">
+      <div class="sub-icon">⭐</div>
+      <div>
+        <div class="sub-card-title">Your Subscription</div>
+        <div class="sub-card-sub">Premium membership details</div>
+      </div>
+    </div>
+
+    {% if sub.2 < today %}
+      <span class="sub-status-expired">❌ Expired</span>
+    {% else %}
+      <span class="sub-status-active">✅ Active</span>
+    {% endif %}
+
+    <div class="sub-details">
+      <div class="sub-detail-item">
+        <span class="sub-detail-label">Plan</span>
+        <span class="sub-detail-value">{{ sub.0|capfirst }}</span>
+      </div>
+      <div class="sub-detail-item">
+        <span class="sub-detail-label">Amount Paid</span>
+        <span class="sub-detail-value">₹{{ sub.3 }}</span>
+      </div>
+      <div class="sub-detail-item">
+        <span class="sub-detail-label">Start Date</span>
+        <span class="sub-detail-value">{{ sub.1 }}</span>
+      </div>
+      <div class="sub-detail-item">
+        <span class="sub-detail-label">Expiry Date</span>
+        <span class="sub-detail-value">{{ sub.2 }}</span>
+      </div>
+    </div>
+
+  </div>
+
+  {% else %}
+
+  <!-- No Subscription -->
+  <div class="nosub-card">
+    <div class="nosub-icon">🔒</div>
+    <div class="nosub-title">No Active Subscription</div>
+    <div class="nosub-desc">Upgrade to premium to unlock exclusive blogs<br>and support your favourite authors.</div>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="plan-grid">
+
+      <!-- Monthly -->
+      <div class="plan-card">
+        <div class="plan-icon">📅</div>
+        <div class="plan-name">Monthly</div>
+        <div class="plan-price">₹199 <span>/ month</span></div>
+        <div class="plan-perks">
+          <div class="plan-perk"><span class="perk-icon">⭐</span> All premium blogs</div>
+          <div class="plan-perk"><span class="perk-icon">✍️</span> Support authors</div>
+          <div class="plan-perk"><span class="perk-icon">🔔</span> Exclusive updates</div>
+        </div>
+        <button class="btn-plan secondary" name="plan" value="monthly">Get Monthly</button>
+      </div>
+
+      <!-- Yearly -->
+      <div class="plan-card featured">
+        <span class="plan-recommended">Best Value</span>
+        <div class="plan-icon">🗓️</div>
+        <div class="plan-name">Yearly</div>
+        <div class="plan-price">₹1,999 <span>/ year</span></div>
+        <div class="plan-savings">Save ₹389 vs monthly</div>
+        <div class="plan-perks">
+          <div class="plan-perk"><span class="perk-icon">⭐</span> All premium blogs</div>
+          <div class="plan-perk"><span class="perk-icon">✍️</span> Support authors</div>
+          <div class="plan-perk"><span class="perk-icon">🔔</span> Exclusive updates</div>
+        </div>
+        <button class="btn-plan primary" name="plan" value="yearly">Get Yearly</button>
+      </div>
+
+    </div>
+  </form>
+
+  {% endif %}
+
+</div>
+
+{% endblock %}

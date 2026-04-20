@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap');
+
+.pp {
+    font-family: 'Inter', sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+}
+
+/* ── HERO SECTION ── */
+.hero {
+    background: #111;
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.hero-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.hero-left { display: flex; gap: 1.5rem; align-items: center; }
+
+.avi {
+    width: 85px; height: 85px; border-radius: 50%; padding: 3px;
+    background: conic-gradient(#EF9F27, #BA7517, #EF9F27);
+}
+
+.avi-inner {
+    width: 100%; height: 100%; border-radius: 50%; background: #1e1a14;
+    display: flex; align-items: center; justify-content: center;
+    color: #EF9F27; font-weight: 700; overflow: hidden;
+}
+
+.avi-inner img { width: 100%; height: 100%; object-fit: cover; }
+
+.hero-name { color: #fff; font-size: 26px; font-family: 'Playfair Display', serif; margin-bottom: 4px; }
+.hero-bio { color: #aaa; font-size: 14px; margin-bottom: 12px; }
+
+.followers-count-pill {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+    font-weight: 600; padding: 5px 14px; border-radius: 20px;
+    background: #222; color: #ddd; border: 1px solid #333;
+}
+
+.hero-actions { display: flex; flex-direction: column; gap: 10px; min-width: 180px; }
+
+.btn {
+    padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    text-decoration: none; text-align: center; transition: all 0.2s;
+}
+
+.btn-amber { background: #BA7517; color: white; border: none; }
+.btn-amber:hover { background: #d48412; }
+.btn-ghost { background: #222; color: #ddd; border: 1px solid #333; }
+.btn-ghost:hover { background: #2a2a2a; color: #fff; }
+
+/* ── GRID & PANELS ── */
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.col-full { grid-column: 1 / -1; }
+
+.panel { background: #fff; border-radius: 16px; border: 1px solid #eee; overflow: hidden; }
+.ph {
+    padding: 1rem 1.25rem; border-bottom: 1px solid #eee; font-size: 11px;
+    font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.pb { padding: 1.25rem; }
+
+/* ── UNIFIED INTERACTIVE CARDS ── */
+.profile-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid transparent;
+}
+
+.profile-card:hover {
+    background: #fdfaf3;
+    transform: translateY(-3px) scale(1.02);
+    border-color: rgba(186, 117, 23, 0.2);
+    box-shadow: 0 8px 20px rgba(186, 117, 23, 0.08);
+}
+
+.card-icon-box {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: #1a1612; color: #EF9F27;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; overflow: hidden;
+    flex-shrink: 0; border: 1px solid #eee;
+    transition: transform 0.3s ease;
+}
+
+.pub-icon-box { border-radius: 10px; font-size: 16px; }
+
+.profile-card:hover .card-icon-box { transform: rotate(-5deg) scale(1.1); }
+
+.card-info { display: flex; flex-direction: column; flex-grow: 1; }
+
+.card-name { font-size: 14.5px; font-weight: 600; color: #1a1a1a; line-height: 1.2; transition: color 0.3s ease; }
+.profile-card:hover .card-name { color: #BA7517; }
+
+.card-label { font-size: 10px; color: #BA7517; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+.card-arrow { color: #ddd; transition: all 0.3s ease; }
+.profile-card:hover .card-arrow { color: #BA7517; transform: translateX(5px); }
+
+/* ── CATEGORIES ── */
+.cat-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+.cat-pill { background: #f0ece3; padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 500; color: #633806; }
+
+/* ── ADMIN CARD ── */
+.admin-menu-card {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #1e1b18; border: 1px solid rgba(186, 117, 23, 0.4);
+    border-radius: 10px; padding: 12px 16px; text-decoration: none; transition: all 0.2s;
+}
+</style>
+
+<div class="pp">
+
+    <div class="hero">
+        <div class="hero-body">
+            <div class="hero-left">
+                <div class="avi">
+                    <div class="avi-inner">
+                        {% if user.3 %}
+                            <img src="/static/avatars/avatar_{{ user.3 }}.png">
+                        {% else %}
+                            {{ user.0|slice:":1" }}{{ user.1|slice:":1" }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div>
+                    <div class="hero-name">{{ user.0 }} {{ user.1 }}</div>
+                    <div class="hero-bio">{{ user.2 }}</div>
+                    {% if is_author %}
+                        <div class="followers-count-pill">👥 {{ followers_count|default:"0" }} Followers</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="hero-actions">
+                <a href="/edit-profile/" class="btn btn-ghost">Edit Profile</a>
+                {% if not is_author %} <a href="/toggle-author/" class="btn btn-amber">Join as Author</a> {% endif %}
+                {% if is_author %} <a href="/donations/" class="btn btn-ghost">Donations</a> {% endif %}
+                {% if is_author and not is_member %} <a href="/create_publication/" class="btn btn-ghost">+ Publication</a> {% endif %}
+                {% if request.session.is_admin %}
+                <a href="{% url 'admin_dashboard' %}" class="admin-menu-card">
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="color:white; font-size:13px; font-weight:600;">🛡️ Admin Dashboard</span>
+                        <span style="color:#888; font-size:11px;">Manage Platform</span>
+                    </div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#BA7517" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="grid">
+        
+        <div class="panel">
+            <div class="ph">Your Publication</div>
+            <div class="pb">
+                {% if is_owner %}
+                    <a href="/owner-dashboard/" class="profile-card">
+                        <div class="card-icon-box pub-icon-box">📊</div>
+                        <div class="card-info">
+                            <span class="card-name">{{ own_publication.1 }}</span>
+                            <span class="card-label">Owner</span>
+                        </div>
+                        <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+                    </a>
+                {% elif is_member %}
+                    <a href="/publication/{{ publication.0 }}/" class="profile-card">
+                        <div class="card-icon-box pub-icon-box">📄</div>
+                        <div class="card-info">
+                            <span class="card-name">{{ publication.1 }}</span>
+                            <span class="card-label">Member</span>
+                        </div>
+                        <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+                    </a>
+                {% else %}
+                    <p style="color:#bbb; font-size:13px;">No publication link yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="ph">Following</div>
+            <div class="pb" style="display: flex; flex-direction: column; gap: 8px;">
+                {% for f in following %}
+                <a href="/author/{{ f.2 }}/" class="profile-card">
+                    <div class="card-icon-box">
+                        {% if f.3 %} <img src="/static/avatars/avatar_{{ f.3 }}.png" style="width:100%; height:100%; object-fit:cover;">
+                        {% else %} {{ f.0|slice:":1"|upper }}{{ f.1|slice:":1"|upper }} {% endif %}
+                    </div>
+                    <div class="card-info">
+                        <span class="card-name">{{ f.0 }} {{ f.1 }}</span>
+                        <span class="card-label">Author</span>
+                    </div>
+                    <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+                </a>
+                {% empty %}
+                <p style="color:#bbb; font-size:13px;">Not following anyone yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="ph">Publications Following</div>
+            <div class="pb" style="display: flex; flex-direction: column; gap: 8px;">
+                {% for f in publi_following %}
+                    <a href="/publication/{{ f.0 }}/" class="profile-card">
+                        <div class="card-icon-box pub-icon-box">📚</div>
+                        <div class="card-info">
+                            <span class="card-name">{{ f.1 }}</span>
+                            <span class="card-label">Followed Publication</span>
+                        </div>
+                        <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+                    </a>
+                {% empty %}
+                <p style="color:#bbb; font-size:13px;">Not following any publications.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="panel col-full">
+            <div class="ph">Your Interests</div>
+            <div class="pb">
+                {% if selected %}
+                <div class="cat-wrap">
+                    {% for c in categories %}
+                        {% if c.0 in selected %} <span class="cat-pill">{{ c.1 }}</span> {% endif %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p style="color:#bbb; font-size:13px;">No categories selected.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

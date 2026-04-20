@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta charset="UTF-8">
+<title>BlogSpace</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: sans-serif;
+    background: #f5f3ee;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ══════════════════════════════
+     SIDEBAR
+  ══════════════════════════════ */
+  .sidebar {
+    width: 220px; min-height: 100vh; background: #1a1612;
+    display: flex; flex-direction: column; padding: 2rem 0 2rem;
+    position: fixed; top: 0; left: 0; z-index: 50; overflow: hidden;
+  }
+
+  .sidebar-logo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 1.4rem 2.2rem; text-decoration: none; z-index: 1;
+  }
+
+  .logo-icon {
+    width: 34px; height: 34px; background: #BA7517; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .logo-icon svg { width: 17px; height: 17px; fill: #fff; }
+
+  .logo-text { font-size: 18px; font-weight: 600; color: #fff; letter-spacing: -0.3px; }
+  .logo-text span { color: #EF9F27; }
+
+  .sidebar-divider { height: 0.5px; background: rgba(255,255,255,0.08); margin: 0 1.4rem 1.4rem; }
+
+  .sidebar-nav { display: flex; flex-direction: column; gap: 2px; flex: 1; z-index: 1; padding: 0 0.7rem; }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+    border-radius: 8px; text-decoration: none; font-size: 13.5px; font-weight: 500;
+    color: rgba(255,255,255,0.5); transition: background 0.15s, color 0.15s; position: relative;
+  }
+  .nav-item svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; opacity: 0.7; transition: opacity 0.15s; }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+  .nav-item:hover svg { opacity: 1; }
+  .nav-item.active { background: rgba(186,117,23,0.15); color: #EF9F27; }
+  .nav-item.active svg { opacity: 1; }
+
+  .sidebar-bottom { padding: 0 0.7rem; z-index: 1; }
+  .nav-item.logout { color: rgba(255,100,100,0.55); }
+  .nav-item.logout:hover { background: rgba(255,80,80,0.08); color: rgba(255,100,100,0.9); }
+
+  /* ══════════════════════════════
+     MAIN CONTENT & TOASTS
+  ══════════════════════════════ */
+  .main-wrapper { margin-left: 220px; flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+  .content-area { flex: 1; padding: 2.5rem 2.5rem; }
+
+  .toast-container { position: fixed; top: 1.4rem; right: 1.4rem; z-index: 999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+  .toast {
+    display: flex; align-items: flex-start; gap: 10px; background: #fff; border-radius: 10px; padding: 13px 16px;
+    min-width: 280px; max-width: 360px; box-shadow: 0 8px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+    border-left: 3px solid #BA7517; pointer-events: all; cursor: pointer;
+    animation: toastIn 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards, toastOut 0.3s ease forwards 4.7s;
+  }
+  .toast.success { border-left-color: #22a06b; }
+  .toast.error   { border-left-color: #e5484d; }
+  .toast.warning { border-left-color: #f59e0b; }
+  .toast.info    { border-left-color: #BA7517; }
+
+  @keyframes toastIn { from { opacity: 0; transform: translateX(30px) scale(0.95); } to { opacity: 1; transform: translateX(0) scale(1); } }
+  @keyframes toastOut { from { opacity: 1; transform: translateX(0); max-height: 100px; } to { opacity: 0; transform: translateX(30px); max-height: 0; padding: 0; margin: 0; } }
+
+  .toast-icon { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+  .toast-body { flex: 1; }
+  .toast-msg { font-size: 13.5px; color: #222; font-weight: 500; line-height: 1.45; }
+  .toast-close { background: none; border: none; cursor: pointer; color: #bbb; font-size: 16px; line-height: 1; padding: 0; transition: color 0.15s; flex-shrink: 0; }
+  .toast-close:hover { color: #555; }  
+
+  /* ══════════════════════════════
+     GLOBAL BLOG CARD STYLES
+  ══════════════════════════════ */
+  .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+
+  .blog-card {
+    background: #fff; border: 0.5px solid #e8e8e8; border-radius: 14px; padding: 1.25rem 1.4rem;
+    display: flex; flex-direction: column; gap: 10px; transition: border-color .2s, transform .2s, box-shadow .2s;
+    animation: fadeUp .45s ease both; cursor: pointer; text-decoration: none; color: inherit;
+  }
+  .blog-card:hover { border-color: #ccc; transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+  
+  .blog-card:nth-child(1) { animation-delay: .05s; } .blog-card:nth-child(2) { animation-delay: .10s; }
+  .blog-card:nth-child(3) { animation-delay: .15s; } .blog-card:nth-child(4) { animation-delay: .20s; }
+  .blog-card:nth-child(5) { animation-delay: .25s; } .blog-card:nth-child(6) { animation-delay: .30s; }
+  .blog-card:nth-child(n+7) { animation-delay: .35s; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .card-title { font-size: 15px; font-weight: 600; color: #1a1612; text-decoration: none; line-height: 1.45; flex: 1; transition: color .15s; }
+  .blog-card:hover .card-title { color: #BA7517; }
+
+  .premium-badge { flex-shrink: 0; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px; background: #FAEEDA; color: #633806; white-space: nowrap; border: 0.5px solid #FAC775; }
+  
+  .pub-badge { 
+    flex-shrink: 0; 
+    font-size: 11.5px; 
+    font-weight: 600; 
+    padding: 3px 9px; 
+    border-radius: 20px; 
+    background: #f5f5f5; 
+    color: #555; 
+    white-space: nowrap; 
+    border: 0.5px solid #e5e5e5; 
+    text-decoration: none; 
+    
+    /* Changed to 'all' to smoothly animate the lift and colors */
+    transition: all 0.2s ease; 
+  }
+
+  .pub-badge:hover { 
+    /* Matches the author link's orange theme */
+    background: #FAEEDA; 
+    color: #BA7517; 
+    border-color: #FAC775; 
+    
+    /* Creates the smooth lift animation */
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 8px rgba(186, 117, 23, 0.12);
+  }
+
+  .cat-chip input:checked + label { 
+    background: #BA7517 !important; 
+    border-color: #BA7517 !important; 
+    color: #fff !important; 
+}
+
+  .card-excerpt { font-size: 13px; color: #666; line-height: 1.65; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+  .card-footer { margin-top: auto; padding-top: 12px; border-top: 0.5px solid #f0f0f0; display: flex; flex-direction: column; gap: 10px; }
+
+  .author-row { display: flex; align-items: center; gap: 8px; }
+  .author-avatar { width: 28px; height: 28px; border-radius: 50%; background: #FAEEDA; color: #633806; border: 0.5px solid #FAC775; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; text-transform: uppercase; }
+  .author-link { font-size: 13px; color: #555; text-decoration: none; transition: color .15s; font-weight: 500; }
+  .author-link:hover { color: #BA7517; }
+
+  .meta-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .meta-item { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: #999; }
+  .meta-item svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 2; fill: none; flex-shrink: 0; }
+
+  .empty-state { text-align: center; padding: 5rem 2rem; color: #aaa; font-size: 14px; grid-column: 1 / -1; }
+
+  .avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <a href="/home/" class="sidebar-logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v2H4zm0 4h10v2H4zm0 4h16v2H4zm0 4h8v2H4z"/></svg></div>
+    <div class="logo-text">Blog<span>Space</span></div>
+  </a>
+  <div class="sidebar-divider"></div>
+  <nav class="sidebar-nav">
+    <a href="/home/" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>Home</a>
+    <a href="/profile/" class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Profile</a>
+    <a href="/library/" class="nav-item"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Library</a>
+    <a href="/write/" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>Write</a>
+    <a href="/stories/" class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>Stories</a>
+    <a href="/publications/" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l6 6v8a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>Publications</a>
+    <a href="/subscriptions/" class="nav-item"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>Subscriptions</a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="sidebar-divider" style="margin-bottom:1rem;"></div>
+    <a href="/logout/" class="nav-item logout"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</a>
+  </div>
+</aside>
+
+{% if messages %}
+<div class="toast-container" id="toastContainer">
+  {% for message in messages %}
+  <div class="toast {{ message.tags }}" onclick="this.remove()">
+    {% if message.tags == 'success' %}
+    <svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="#22a06b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>
+    {% elif message.tags == 'error' %}
+    <svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="#e5484d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="#e5484d"/></svg>
+    {% elif message.tags == 'warning' %}
+    <svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r="0.5" fill="#f59e0b"/></svg>
+    {% else %}
+    <svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="#BA7517" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="#BA7517"/></svg>
+    {% endif %}
+    <div class="toast-body"><p class="toast-msg">{{ message }}</p></div>
+    <button class="toast-close" onclick="this.closest('.toast').remove()">×</button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="main-wrapper">
+  <div class="content-area">
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.toast').forEach(function(toast) {
+    setTimeout(function() {
+      toast.style.animation = 'toastOut 0.3s ease forwards';
+      setTimeout(function() { toast.remove(); }, 300);
+    }, 5000);
+  });
+
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-item').forEach(function(link) {
+    if (link.getAttribute('href') === path) {
+      link.classList.add('active');
+    }
+  });
+
+  window.addEventListener("pageshow", function (event) {
+      if (event.persisted) { window.location.reload(); }
+  });
+
+  window.onload = function() {
+      let forms = document.getElementsByTagName("form");
+      for (let i = 0; i < forms.length; i++) { forms[i].reset(); }
+  };
+</script>
+
+</body>
+</html>
